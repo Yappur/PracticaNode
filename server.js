@@ -14,7 +14,7 @@ const logger = (req, res, next) => {
     `Ruta recibida: ${req.method} ${req.url} - ${new Date().toISOString()}`
   );
   next();
-}
+};
 // Middleware: Son una funcion que va a intervenir entre la http.req y la http.res
 
 app.use(express.json()); // Permite recibir datos en formato json
@@ -24,14 +24,26 @@ app.use(logger); // Aplica el middleware a todas las rutas
 // Se crean las rutas con express
 // req = request, res = response
 app.get("/", (req, res) => {
-  res.send("<h1>Bienvenido a mi home</h1>");
+  res.status(200).json({
+    message: "Hola mundo desde express",
+    endpoint: [
+      {
+        method: "GET",
+        url: "/api/productos",
+      },
+      {
+        method: "POST",
+        url: "/api/productos",
+      },
+    ],
+  });
 });
 
 // Ruta GET para obtener todos los productos
 app.get("/api/productos", (req, res) => {
   res.status(200).json({
     message: "Productos obtenidos correctamente",
-    productos: productos
+    productos: productos,
   });
 });
 
@@ -39,8 +51,8 @@ app.post("/api/productos", (req, res) => {
   const nuevoProducto = req.body;
   const id = req.body.id;
 
-  if (!nuevoProducto) {
-    res.status(404).json({ message: "No se envio ningun producto" });
+  if (req.body.id || req.body.nombre || req.body.precio) {
+    return res.status(400).json({ message: "No se envio ningun producto" });
   }
 
   productos.push(nuevoProducto);
